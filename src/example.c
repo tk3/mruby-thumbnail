@@ -23,8 +23,7 @@ static const mrb_data_type mrb_thumbnail_type = {
 };
 
 static mrb_value
-mrb_thumbnail_initialize(mrb_state *mrb, mrb_value self)
-{
+mrb_thumbnail_initialize(mrb_state *mrb, mrb_value self) {
   mrb_thumbnail *thumbnail;
 
   thumbnail = (mrb_thumbnail *)malloc(sizeof(mrb_thumbnail));
@@ -44,8 +43,7 @@ mrb_thumbnail_initialize(mrb_state *mrb, mrb_value self)
 }
 
 static void
-mrb_thumbnail_free(mrb_state *mrb, void *p)
-{
+mrb_thumbnail_free(mrb_state *mrb, void *p) {
   mrb_thumbnail *thumbnail = (mrb_thumbnail *)p;
 
   if (thumbnail->wand != NULL) {
@@ -56,8 +54,7 @@ mrb_thumbnail_free(mrb_state *mrb, void *p)
 }
 
 static char*
-mrb_thumbnail_get_error_message(MagickWand *wand, char *message, size_t message_len)
-{
+mrb_thumbnail_get_error_message(MagickWand *wand, char *message, size_t message_len) {
   char *description;
   ExceptionType excep;
 
@@ -71,8 +68,7 @@ mrb_thumbnail_get_error_message(MagickWand *wand, char *message, size_t message_
 }
 
 static mrb_value
-mrb_thumbnail_load_file(mrb_state *mrb, mrb_value self)
-{
+mrb_thumbnail_load_file(mrb_state *mrb, mrb_value self) {
   mrb_thumbnail *thumbnail;
   char *filename;
   MagickBooleanType ret;
@@ -95,8 +91,7 @@ mrb_thumbnail_load_file(mrb_state *mrb, mrb_value self)
 }
 
 static mrb_value
-mrb_thumbnail_get_height(mrb_state *mrb, mrb_value self)
-{
+mrb_thumbnail_get_height(mrb_state *mrb, mrb_value self) {
   mrb_thumbnail *thumbnail;
 
   thumbnail = mrb_get_datatype(mrb, self, &mrb_thumbnail_type);
@@ -108,8 +103,7 @@ mrb_thumbnail_get_height(mrb_state *mrb, mrb_value self)
 }
 
 static mrb_value
-mrb_thumbnail_get_width(mrb_state *mrb, mrb_value self)
-{
+mrb_thumbnail_get_width(mrb_state *mrb, mrb_value self) {
   mrb_thumbnail *thumbnail;
 
   thumbnail = mrb_get_datatype(mrb, self, &mrb_thumbnail_type);
@@ -121,8 +115,7 @@ mrb_thumbnail_get_width(mrb_state *mrb, mrb_value self)
 }
 
 static mrb_value
-mrb_thumbnail_resize(mrb_state *mrb, mrb_value self)
-{
+mrb_thumbnail_resize(mrb_state *mrb, mrb_value self) {
   mrb_thumbnail *thumbnail;
   mrb_int width;
   mrb_int height;
@@ -146,8 +139,7 @@ mrb_thumbnail_resize(mrb_state *mrb, mrb_value self)
 }
 
 static mrb_value
-mrb_thumbnail_write_file(mrb_state *mrb, mrb_value self)
-{
+mrb_thumbnail_write_file(mrb_state *mrb, mrb_value self) {
   mrb_thumbnail *thumbnail;
   char *filename;
   MagickBooleanType ret;
