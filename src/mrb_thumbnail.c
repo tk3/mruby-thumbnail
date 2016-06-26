@@ -1,5 +1,5 @@
 #include <string.h>
-#include <wand/magick_wand.h>
+#include <wand/magick-wand.h>
 #include <mruby.h>
 #include <mruby/variable.h>
 #include <mruby/class.h>
@@ -150,6 +150,12 @@ mrb_thumbnail_write_file(mrb_state *mrb, mrb_value self) {
   thumbnail = mrb_get_datatype(mrb, self, &mrb_thumbnail_type);
   if (thumbnail == NULL) {
     mrb_raise(mrb, E_ARGUMENT_ERROR, "invalid argument");
+  }
+
+  ret = MagickStripImage(thumbnail->wand);
+  if (ret != MagickTrue) {
+    err_message[sizeof(err_message) - 1] = '\0';
+    mrb_raise(mrb, E_RUNTIME_ERROR, mrb_thumbnail_get_error_message(thumbnail->wand, err_message, sizeof(err_message) - 1));
   }
 
   ret = MagickSetImageCompressionQuality(thumbnail->wand, 95);
