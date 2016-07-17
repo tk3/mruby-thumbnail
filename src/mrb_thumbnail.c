@@ -13,6 +13,8 @@ static mrb_value mrb_thumbnail_initialize(mrb_state *mrb, mrb_value self);
 static void mrb_thumbnail_free(mrb_state *mrb, void *p);
 static char *mrb_thumbnail_get_error_message(MagickWand *wand, char *message, size_t message_len);
 static mrb_value mrb_thumbnail_load_file(mrb_state *mrb, mrb_value self);
+static mrb_value mrb_thumbnail_from_blob(mrb_state *mrb, mrb_value self);
+static mrb_value mrb_thumbnail_to_blob(mrb_state *mrb, mrb_value self);
 static mrb_value mrb_thumbnail_get_height(mrb_state *mrb, mrb_value self);
 static mrb_value mrb_thumbnail_get_width(mrb_state *mrb, mrb_value self);
 static mrb_value mrb_thumbnail_resize(mrb_state *mrb, mrb_value self);
@@ -88,6 +90,51 @@ mrb_thumbnail_load_file(mrb_state *mrb, mrb_value self) {
   }
 
   return self;
+}
+
+static mrb_value
+mrb_thumbnail_from_blob(mrb_state *mrb, mrb_value self) {
+  mrb_thumbnail *thumbnail;
+  MagickBooleanType ret;
+  char err_message[1024];
+  unsigned char *data;
+  mrb_int len;
+
+  mrb_get_args(mrb, "s", &data, &len);
+
+  thumbnail = mrb_get_datatype(mrb, self, &mrb_thumbnail_type);
+  if (thumbnail == NULL) {
+    mrb_raise(mrb, E_ARGUMENT_ERROR, "invalid argument");
+  }
+
+  ret = MagickReadImageBlob(thumbnail->wand, data, len);
+  if (ret != MagickTrue) {
+    err_message[sizeof(err_message) - 1] = '\0';
+    mrb_raise(mrb, E_RUNTIME_ERROR, mrb_thumbnail_get_error_message(thumbnail->wand, err_message, sizeof(err_message) - 1));
+  }
+
+  return self;
+}
+
+static mrb_value
+mrb_thumbnail_to_blob(mrb_state *mrb, mrb_value self) {
+  mrb_thumbnail *thumbnail;
+  char err_message[1024];
+  unsigned char *data;
+  mrb_int len;
+
+  thumbnail = mrb_get_datatype(mrb, self, &mrb_thumbnail_type);
+  if (thumbnail == NULL) {
+    mrb_raise(mrb, E_ARGUMENT_ERROR, "invalid argument");
+  }
+
+  data = MagickGetImageBlob(thumbnail->wand, (size_t *)&len);
+  if (data == NULL) {
+    err_message[sizeof(err_message) - 1] = '\0';
+    mrb_raise(mrb, E_RUNTIME_ERROR, mrb_thumbnail_get_error_message(thumbnail->wand, err_message, sizeof(err_message) - 1));
+  }
+
+  return mrb_str_new(mrb, (const char *)data, len);
 }
 
 static mrb_value
@@ -184,6 +231,8 @@ mrb_mruby_thumbnail_gem_init(mrb_state* mrb) {
 
   mrb_define_method(mrb, class_thumbnail, "initialize", mrb_thumbnail_initialize, MRB_ARGS_NONE());
   mrb_define_method(mrb, class_thumbnail, "load_file", mrb_thumbnail_load_file, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, class_thumbnail, "from_blob", mrb_thumbnail_from_blob, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, class_thumbnail, "to_blob", mrb_thumbnail_to_blob, MRB_ARGS_NONE());
   mrb_define_method(mrb, class_thumbnail, "height", mrb_thumbnail_get_height, MRB_ARGS_NONE());
   mrb_define_method(mrb, class_thumbnail, "width", mrb_thumbnail_get_width, MRB_ARGS_NONE());
   mrb_define_method(mrb, class_thumbnail, "resize", mrb_thumbnail_resize, MRB_ARGS_REQ(2));
